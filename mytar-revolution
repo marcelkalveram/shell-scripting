@@ -1,0 +1,38 @@
+#!/bin/bash
+
+DEST="/save"
+PREFIX="backup"
+
+while getopts "f:bn:d:" OPT; do     # Check parameter pattern
+  case $OPT in
+
+
+    f) DIRS=$OPTARG  ;;               # -f file with directory list
+    b) ZIP="j"; EXT="tbz" ;;          # -b = use bzip2 instead of gzip
+    n) PREFIX=$OPTARG ;;              # -n <Prefix>
+    d) if [ "${OPTARG:0:1}" = "/" ]   # -d >directory
+      then
+        DEST=$OPTARG
+      else
+        echo "directory needs to start with /"
+        exit 1
+      fi
+      ;;
+:) echo "You have to provide an argument for the option -$OPTARG."
+   exit 1
+   ;;
+*) echo "Not a valid argument: -$OPTARG"
+   exit 1
+   ;;
+  esac
+done
+if [ -z $DIRS ]; then    #Datei mit Verzeichnisliste vorhanden?
+  echo "The option -f for the list file is missing"
+  exit 1
+elif [ ! -r $DIRS ]; then
+  echo "Couldn't read or find the file $DIRS."
+  exit 1
+fi
+
+DAT="$(/bin/date +%d%m%g)"
+tar -${ZIP-z} -c -f /$DEST/${PREFIX}_$DAT.${EXT-tgz} `cat $DIRS` > /dev/null

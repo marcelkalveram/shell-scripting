@@ -1,0 +1,5 @@
+#!/bin/bash
+
+if [ $# -gt 0 ]; then # At least one argument
+  tar czf /save/mystuff.tgz $@ >/dev/null
+fi
